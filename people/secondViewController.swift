@@ -1,60 +1,52 @@
 //
-//  ViewController.swift
+//  secondViewController.swift
 //  people
 //
-//  Created by لمياء فالح الدوسري on 18/05/1443 AH.
+//  Created by لمياء فالح الدوسري on 19/05/1443 AH.
 //
 
 import UIKit
 
-class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
-{
-  
-    
-    let url = URL(string: "https://swapi.dev/api/people/?format=json")
-    
-    @IBOutlet weak var tableView: UITableView!
-//let url2 = URL(string: "https://api.opendota.com/api/heroStats")
+class secondViewController: UIViewController ,UITableViewDelegate,UITableViewDataSource{
 
-    var pepleArray:[String]=[]
-   // var peoples=[people]()
-   // var hero=[HeroStats]()
 
+    
+    @IBOutlet weak var tableView2: UITableView!
+    let url = URL(string: "https://swapi.dev/api/films/?format=json")
+    
+    var filemsArray:[String]=[]
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-
         APIreq2{
-            print("works")
+            print("hiiii")
             
-            self.tableView.reloadData()
+            self.tableView2.reloadData()
 
         }
-      
-       
+
+        // Do any additional setup after loading the view.
     }
-    
-   
     
     func APIreq2(completed: @escaping () ->()){
         URLSession.shared.dataTask(with: url!){
             (data,respone, error) in
             if error == nil{
                 do{
-               let re:people = try JSONDecoder().decode(people.self, from: data!)
+               let re:filems = try JSONDecoder().decode(filems.self, from: data!)
                     print("ooooooooooooooo")
-                    print(re.next)
-                    print(re.results[0].name)
-                    print(re.results[0].height)
+                   // print(re.next)
+                   // print(re.results[0].name)
+                    print(re.results[0].title)
                     print("ooooooooooooooo")
 //                    for re in re{
 //                    pepleArray.append(re.results[0].name)
 //
 //                    }
                     for i in 0..<re.results.count {
-                        self.pepleArray.append(re.results[i].name)
+                        self.filemsArray.append(re.results[i].title)
                         
-                        print("\(self.pepleArray)")
+                        print("\(self.filemsArray)")
 
                     }
                         
@@ -83,33 +75,21 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
    
    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return pepleArray.count
+        return filemsArray.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell=tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        cell.textLabel?.text = pepleArray[indexPath.row]
+        let cell=tableView.dequeueReusableCell(withIdentifier: "cell2", for: indexPath)
+        cell.textLabel?.text = filemsArray[indexPath.row]
         return cell
     }
     
-    
-    
-}
-
-
-
-struct people:Decodable{
-    
-    let results:[name]
-   // let name:String
-    let next :String
-    
-    
-}
-struct name:Decodable{
-    let name :String
-    let  height:String
 
 }
 
-
-
+struct filems:Decodable{
+let results:[filem]
+    
+}
+struct filem:Decodable{
+let title:String
+}
