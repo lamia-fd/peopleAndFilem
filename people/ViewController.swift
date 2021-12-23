@@ -11,75 +11,104 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
 {
   
     
-    let url = URL(string: "https://swapi.dev/api/people/?format=json")
+    ///let url = URL(string: "https://swapi.dev/api/people/?format=json")
     
     @IBOutlet weak var tableView: UITableView!
-//let url2 = URL(string: "https://api.opendota.com/api/heroStats")
+
 
     var pepleArray:[String]=[]
+    var massArray:[String]=[]
+    var birthYear:[String]=[]
+    var genderArray:[String]=[]
    // var peoples=[people]()
    // var hero=[HeroStats]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        getThePeople.getAllPeople(completionHandler: { // passing what becomes "completionHandler" in the 'getAllPeople' function definition in StarWarsModel.swift
+                    data, response, error in
+                        do {
+                            // Try converting the JSON object to "Foundation Types" (NSDictionary, NSArray, NSString, etc.)
+                            if let jsonResult = try JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.mutableContainers) as? NSDictionary {
+                                if let results = jsonResult["results"] as? NSArray {
+                                    for person in results {
+                                        let personDict = person as! NSDictionary
+                                        self.pepleArray.append(personDict["name"]! as! String)
+                                        self.massArray.append(personDict["mass"]! as! String)
+                                        self.birthYear.append(personDict["birth_year"]! as! String)
+                                        self.genderArray.append(personDict["gender"]! as! String)
+                                        
+//                                        mass
+//                                        birth_year
+//                                        gender
+                                    }
+                                }
+                            }
+                            DispatchQueue.main.async {
+                                self.tableView.reloadData()
+                            }
+                        } catch {
+                            print("Something went wrong")
+                        }
+                })
 
-        APIreq2{
-            print("works")
-            
-            self.tableView.reloadData()
-
-        }
-      
        
     }
     
    
     
-    func APIreq2(completed: @escaping () ->()){
-        URLSession.shared.dataTask(with: url!){
-            (data,respone, error) in
-            if error == nil{
-                do{
-               let re:people = try JSONDecoder().decode(people.self, from: data!)
-                    print("ooooooooooooooo")
-                    print(re.next)
-                    print(re.results[0].name)
-                    print(re.results[0].height)
-                    print("ooooooooooooooo")
-//                    for re in re{
-//                    pepleArray.append(re.results[0].name)
+//    func APIreq2(completed: @escaping () ->()){
+//        URLSession.shared.dataTask(with: url!){
+//            (data,respone, error) in
+//            if error == nil{
+//                do{
+//               let re:people = try JSONDecoder().decode(people.self, from: data!)
+//                    print("ooooooooooooooo")
+//                    print(re.next)
+//                    print(re.results[0].name)
+//                    print(re.results[0].height)
+//                    print("ooooooooooooooo")
+////                    for re in re{
+////                    pepleArray.append(re.results[0].name)
+////
+////                    }
+//                    for i in 0..<re.results.count {
+//                        self.pepleArray.append(re.results[i].name)
+//
+//                        print("\(self.pepleArray)")
 //
 //                    }
-                    for i in 0..<re.results.count {
-                        self.pepleArray.append(re.results[i].name)
-                        
-                        print("\(self.pepleArray)")
+//
+//
+//
+//
+//
+//                    DispatchQueue.main.sync {
+//                        completed()
+//                    }
+//
+//                }catch{
+//                    print("json error")
+//                }
+//            }
+//        }.resume()
+//
+//
+//
+//
+//    }
+//
+    
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let page2=self.storyboard?.instantiateViewController(withIdentifier: "peopleDetailViewController") as! peopleDetailViewController
+        page2.mass = massArray[indexPath.row]
+        page2.birth=birthYear[indexPath.row]
+        page2.gender=genderArray[indexPath.row]
 
-                    }
-                        
-                        
-                    
-                    
-                    
-                    DispatchQueue.main.sync {
-                        completed()
-                    }
-                    
-                }catch{
-                    print("json error")
-                }
-            }
-        }.resume()
-        
-        
-        
-        
+        self.navigationController?.pushViewController(page2, animated: true)
     }
-    
-    
-    
-    
    
    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -112,4 +141,17 @@ struct name:Decodable{
 }
 
 
-
+class getThePeople{
+    
+    static func getAllPeople(completionHandler:@escaping (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void) {
+          // Specify the url that we will be sending the GET Request to
+          let url = URL(string: "https://swapi.dev/api/people/?format=json")
+          // Create a URLSession to handle the request tasks
+          let session = URLSession.shared
+          // Create a "data task" which will request some data from a URL and then run the completion handler that we are passing into the getAllPeople function itself
+          let task = session.dataTask(with: url!, completionHandler: completionHandler)
+          // Actually "execute" the task. This is the line that actually makes the request that we set up above
+          task.resume()
+      }
+    
+}
